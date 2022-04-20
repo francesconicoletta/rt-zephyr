@@ -14,3 +14,6 @@ _deps
 *-prefix/
 .ninja_deps
 .ninja_log
+*.vim
+todo
+*.swp
