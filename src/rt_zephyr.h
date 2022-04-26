@@ -34,6 +34,6 @@
 #define STARTTHREAD(t_name)	k_thread_start(&thread_data_##t_name);
 
 #define NEWEVENT(t_name, ev_name, num, ev_type, usecs)				\
-	strcpy(events_##t_name[num].name, ev_name);				\
+	events_##t_name[num].name = XSTR(ev_name);				\
 	events_##t_name[num].type = ev_type;					\
 	events_##t_name[num].duration = usecs;

@@ -14,7 +14,7 @@ typedef enum resource_t
 } resource_t;
 
 typedef struct _event_data_t {
-	char name[20];
+	char *name;
 	unsigned long duration;
 	resource_t type;
 } event_data_t;
