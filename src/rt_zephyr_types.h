@@ -7,10 +7,6 @@ typedef struct _log_data_t {
 	/* TODO: add needed types */
 } log_data_t;
 
-/*
- * TODO: check which resource types are needed
- * these are event types
- */
 typedef enum resource_t
 {
 	ev_run,
@@ -18,24 +14,16 @@ typedef enum resource_t
 } resource_t;
 
 typedef struct _event_data_t {
-	/* TODO order this */
-	char name[48];
-	resource_t type;
+	char name[20];
 	unsigned long duration;
+	resource_t type;
 } event_data_t;
-
-typedef struct _phase_data_t {
-	int loop;
-	event_data_t *events;
-	int nbevents;
-} phase_data_t;
 
 typedef struct _thread_data_t {
 	char *name;
-	int duration;
+	event_data_t *events;
 	int loop;
-	int nphases;
-	int forked;
-	int num_instances;
-	phase_data_t *phases;
+	int nbevents;
+	int priority;
+	k_timeout_t delay;
 } thread_data_t;

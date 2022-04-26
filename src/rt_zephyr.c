@@ -11,13 +11,22 @@
 #include "rt_zephyr.h"
 #include "rt_zephyr_types.h"
 
-#define STACKSIZE 1024
-#define INIT_PRIORITY -1
-
 static int p_load = 0;
 
-K_THREAD_STACK_DEFINE(init_thread_stack_area, STACKSIZE);
-static struct k_thread init_thread_data;
+NEWTHREADSTACK(th1)
+NEWTHREADSTACK(th2)
+
+k_timeout_t delay(int del)
+{
+	switch(del) {
+	case -1:
+		return K_FOREVER;
+	case 0:
+		return K_NO_WAIT;
+	default:
+		return K_USEC(del);
+	}
+}
 
 void waste_cpu_cycles(int load_loops)
 {
@@ -34,7 +43,6 @@ void waste_cpu_cycles(int load_loops)
 		result = ldexp(param, (ldexp(param, ldexp(param, n))));
 		result = ldexp(param, (ldexp(param, ldexp(param, n))));
 	}
-	return;
 }
 
 int calibrate_cpu_cycles(void)
@@ -99,10 +107,9 @@ static inline unsigned long loadwait(unsigned long exec)
 	return perf;
 }
 
-int run_event(event_data_t *event, unsigned long *perf, log_data_t *ldata)
+void run_event(event_data_t *event, unsigned long *perf, log_data_t *ldata)
 {
-	/* TODO: log data duration */
-	unsigned long lock = 1;
+	/* TODO: log data */
 	switch(event->type) {
 	case ev_run:
 		{
@@ -125,98 +132,40 @@ int run_event(event_data_t *event, unsigned long *perf, log_data_t *ldata)
 		}
 		break;
 	}
-	return lock;
 }
 
-int run(phase_data_t *pdata, log_data_t *ldata)
+void run_thread(void *thread_data, void *dummy2, void *dummy3)
 {
-	unsigned long perf = 0;
-	int i;
-	
-	event_data_t *events = pdata->events;
-	int nbevents = pdata->nbevents;
-
-	for (i = 0; i < nbevents; i++) {
-		/*
-		 * TODO:
-		 * - fix this
-		 *
-		 * if (!continue_running && !lock)
-		 * 	return perf;
-		 * log_debug("[%d] runs events %d type %d ", ind, i, events[i].type);
-		 * lock += run_event(&events[i], !continue_running, &perf,
-		 *	  tdata, t_first, ldata);
-		 */
-		printk("Event[%d]\n", i);
-		run_event(&events[i], &perf, ldata);
-	}
-
-	return perf;
-}
-
-void init_thread(void *dummy1, void *dummy2, void *dummy3)
-{
-	ARG_UNUSED(dummy1);
 	ARG_UNUSED(dummy2);
 	ARG_UNUSED(dummy3);
 
-	printk("init_thread started \n");
-	/* nanoseconds per loop */
-	p_load = calibrate_cpu_cycles();
-	printk("p_load: %d \n", p_load);
-
-	/*
-	 * from rt-app
-	 * Get the 1st phase's data
-	 * pdata = &data->phases[0];
-	 *
-	 * TODO: pdata should be populated by a config file
-	 */
-	phase_data_t pdata;
-
-	event_data_t event[3];
-	memset(event, 0, sizeof(event));
-
-	strcpy(event[0].name, "prova");
-	event[0].type = ev_run;
-	event[0].duration = 2000000;
-
-	strcpy(event[1].name, "prova");
-	event[1].type = ev_sleep;
-	event[1].duration = 3000000;
-
-	pdata.events = event;
-	pdata.nbevents = 2;
+	unsigned long perf = 0;
 	log_data_t ldata = {0};
+	thread_data_t *tdata = (thread_data_t *) thread_data;
+	event_data_t *events = tdata->events;
 
-	run(&pdata, &ldata);
-	printk("init_thread abort\n");
-	k_thread_abort(&init_thread_data);
+	for (int i = 0; i < tdata->nbevents; i++) {
+		printk("event[%d] - name: %s\n", i, events[i].name);
+		run_event(&events[i], &perf, &ldata);
+	}
 }
 
 void main(void)
 {
-	k_tid_t init_id;
-	k_thread_runtime_stats_t rt_stats_thread;
+	/* nanoseconds per loop */
+	p_load = calibrate_cpu_cycles();
+	printk("p_load: %d \n", p_load);
 
-	/*
-	 * TODO:
-	 * 1. read thread duration, priority, delay etc from config file
-	 * 2. one between main and init_thread should only spawn other threads
-	 */
-	init_id = k_thread_create(&init_thread_data, init_thread_stack_area,
-			K_THREAD_STACK_SIZEOF(init_thread_stack_area),
-			init_thread, NULL, NULL, NULL,
-			INIT_PRIORITY, 0, K_FOREVER);
-	k_thread_name_set(&init_thread_data, "init_thread");
+	DEFTHREAD(th1, 2, -1, 1, 27)
+	NEWEVENT(th1, "th1 ev0 sleep", 0, ev_sleep, 3000000)
+	NEWEVENT(th1, "th1 ev1 run", 1, ev_run, 3000000)
 
-	k_thread_start(&init_thread_data);
+	DEFTHREAD(th2, 3, 0, 1, 1)
+	NEWEVENT(th2, "th2 ev0 sleep", 0, ev_sleep, 3000000)
+	NEWEVENT(th2, "th2 ev1 run", 1, ev_run, 3000000)
+	NEWEVENT(th2, "th2 ev2 sleep", 2, ev_sleep, 6000000)
 
-	k_thread_runtime_stats_get(init_id, &rt_stats_thread);
-
-	/*
-	 * with CONFIG_SCHED_THREAD_USAGE_ANALYSIS we can use current_cycles,
-	 * peak_cycles, average_cycles
-	 * printk("Cycles: %llu\n", rt_stats_thread.execution_cycles);
-	 */
+	STARTTHREAD(th1)
+	STARTTHREAD(th2)
+	/* TODO: duration */
 }
