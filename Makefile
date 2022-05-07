@@ -1,4 +1,5 @@
-.PHONY: builduartqemu buildramqemu buildvega run flash clean debugvega debugqemu
+.PHONY: builduartqemu buildramqemu buildvega run flash debugvega debugqemu traceuartqemu clean
+
 
 builduartqemu:
 	west build --pristine -b qemu_x86_64 . -- -DCONF_FILE=prj_uart_qemu.conf
