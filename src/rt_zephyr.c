@@ -1,20 +1,16 @@
 #include <math.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys_clock.h>
+#include <string.h>
+#include <stdio.h>
 #include <timing/timing.h>
-#include <time.h>
 #include <zephyr.h>
-#include "kernel.h"
 #include "rt_zephyr.h"
 #include "rt_zephyr_types.h"
 
-static int p_load = 0;
-
 NEWTHREADSTACK(th1)
 NEWTHREADSTACK(th2)
+
+static int p_load = 0;
 
 k_timeout_t delay(int del)
 {
@@ -156,14 +152,14 @@ void main(void)
 	p_load = calibrate_cpu_cycles();
 	printk("p_load: %d \n", p_load);
 
-	DEFTHREAD(th1, 2, -1, 1, 27)
+	DEFTHREAD(th1, 2, 0, 1, 1)
 	NEWEVENT(th1, "th1 ev0 sleep", 0, ev_sleep, 3000000)
 	NEWEVENT(th1, "th1 ev1 run", 1, ev_run, 3000000)
 
 	DEFTHREAD(th2, 3, 0, 1, 1)
-	NEWEVENT(th2, "th2 ev0 sleep", 0, ev_sleep, 3000000)
-	NEWEVENT(th2, "th2 ev1 run", 1, ev_run, 3000000)
-	NEWEVENT(th2, "th2 ev2 sleep", 2, ev_sleep, 6000000)
+	NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 1000000)
+	NEWEVENT(th2, "th2 ev1 sleep", 1, ev_sleep, 1000000)
+	NEWEVENT(th2, "th2 ev2 run", 2, ev_run, 1000000)
 
 	STARTTHREAD(th1)
 	STARTTHREAD(th2)
