@@ -1,5 +1,4 @@
-.PHONY: builduartqemu buildramqemu buildvega run flash debugvega debugqemu traceuartqemu clean
-
+.PHONY: builduartqemu buildramqemu buildvega builduartvega run flash debugvega debugqemu traceuartqemu clean
 
 builduartqemu:
 	west build --pristine -b qemu_x86_64 . -- -DCONF_FILE=prj_uart_qemu.conf
@@ -13,6 +12,12 @@ buildvega:
 	ZEPHYR_TOOLCHAIN_VARIANT=cross-compile
 	CROSS_COMPILE=~/riscv32-unknown-elf-gcc/bin/riscv32-unknown-elf-
 	west build --pristine -b rv32m1_vega_ri5cy . -- -DCMAKE_REQUIRED_FLAGS=-Wl,-dT=/dev/null -DCONF_FILE=prj.conf
+	rm -f data/* && mkdir -p data/ && cp $${ZEPHYR_BASE}/subsys/tracing/ctf/tsdl/metadata data/metadata
+
+builduartvega:
+	ZEPHYR_TOOLCHAIN_VARIANT=cross-compile
+	CROSS_COMPILE=~/riscv32-unknown-elf-gcc/bin/riscv32-unknown-elf-
+	west build --pristine -b rv32m1_vega_ri5cy . -- -DCMAKE_REQUIRED_FLAGS=-Wl,-dT=/dev/null -DCONF_FILE=prj_uart_vega.conf
 	rm -f data/* && mkdir -p data/ && cp $${ZEPHYR_BASE}/subsys/tracing/ctf/tsdl/metadata data/metadata
 
 run:
