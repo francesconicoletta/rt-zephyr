@@ -1,4 +1,4 @@
-.PHONY: builduartqemu buildramqemu buildvega builduartvega run flash debugvega debugqemu traceuartqemu clean
+.PHONY: builduartqemu buildramqemu buildvega builduartvega run flash debugvega uartvega debugqemu traceuartqemu clean
 
 builduartqemu:
 	west build --pristine -b qemu_x86_64 . -- -DCONF_FILE=prj_uart_qemu.conf
@@ -28,6 +28,9 @@ flash:
 
 debugvega:
 	west debug --openocd=${HOME}/rv32m1-openocd
+
+uartvega:
+	(stty raw; cat > data/channel0_0) < /dev/ttyACM0
 
 debugqemu:
 	cd build; ninja debugserver
