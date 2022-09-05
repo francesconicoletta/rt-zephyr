@@ -8,4 +8,3 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(rt_zephyr)
 
 target_sources(app PRIVATE src/rt_zephyr.c)
-target_sources_ifdef(CONFIG_TRACING_USER app PRIVATE src/tracing_user.c)
