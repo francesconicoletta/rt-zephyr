@@ -17,3 +17,6 @@ _deps
 *.vim
 todo
 *.swp
+.DS_Store
+.AppleDouble
+.LSOverride
