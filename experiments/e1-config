@@ -1,0 +1,9 @@
+DEFTHREAD(th1, 3, 0, 1, 1)
+NEWEVENT(th1, "th1 ev0 run", 0, ev_run, 1000000)
+NEWEVENT(th1, "th1 ev1 run", 1, ev_run, 1000000)
+NEWEVENT(th1, "th1 ev2 run", 2, ev_run, 1000000)
+
+DEFTHREAD(th2, 3, 0, 1, 1)
+NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 1000000)
+NEWEVENT(th2, "th2 ev1 run", 1, ev_run, 1000000)
+NEWEVENT(th2, "th2 ev2 run", 2, ev_run, 1000000)

@@ -1,0 +1,38 @@
+[01:00:00.010742170] (+?.?????????) thread_switched_in: { thread_id = 1081152, name = "main" }
+[01:00:01.384275742] (+1.373533572) thread_create: { thread_id = 1075520, name = "unknown" }
+[01:00:01.384318492] (+0.000042750) thread_info: { thread_id = 1075520, name = "unknown", stack_base = 1094384, stack_size = 1024 }
+[01:00:01.384390142] (+0.000071650) thread_name_set: { thread_id = 1075520, name = "th1" }
+[01:00:01.384438462] (+0.000048320) thread_create: { thread_id = 1074624, name = "unknown" }
+[01:00:01.384481212] (+0.000042750) thread_info: { thread_id = 1074624, name = "unknown", stack_base = 1093360, stack_size = 1024 }
+[01:00:01.384551672] (+0.000070460) thread_name_set: { thread_id = 1074624, name = "th2" }
+[01:00:01.384600122] (+0.000048450) thread_create: { thread_id = 1073728, name = "unknown" }
+[01:00:01.384642872] (+0.000042750) thread_info: { thread_id = 1073728, name = "unknown", stack_base = 1092336, stack_size = 1024 }
+[01:00:01.384713342] (+0.000070470) thread_name_set: { thread_id = 1073728, name = "th3" }
+[01:00:01.384770592] (+0.000057250) thread_switched_out: { thread_id = 1081152, name = "main" }
+[01:00:01.384819992] (+0.000049400) thread_switched_in: { thread_id = 1074624, name = "th2" }
+[01:00:01.384971232] (+0.000151240) thread_switched_out: { thread_id = 1074624, name = "th2" }
+[01:00:01.385020632] (+0.000049400) thread_switched_in: { thread_id = 1073728, name = "th3" }
+[01:00:02.385120572] (+1.000099940) thread_switched_in: { thread_id = 1073728, name = "th3" }
+[01:00:03.385120792] (+1.000000220) thread_switched_out: { thread_id = 1073728, name = "th3" }
+[01:00:03.385169912] (+0.000049120) thread_switched_in: { thread_id = 1074624, name = "th2" }
+[01:00:06.432980732] (+3.047810820) thread_switched_out: { thread_id = 1074624, name = "th2" }
+[01:00:06.433030142] (+0.000049410) thread_switched_in: { thread_id = 1073728, name = "th3" }
+[01:00:07.435120792] (+1.002090650) thread_switched_out: { thread_id = 1073728, name = "th3" }
+[01:00:07.435169912] (+0.000049120) thread_switched_in: { thread_id = 1074624, name = "th2" }
+[01:00:07.435281472] (+0.000111560) thread_switched_out: { thread_id = 1074624, name = "th2" }
+[01:00:07.435330872] (+0.000049400) thread_switched_in: { thread_id = 1073728, name = "th3" }
+[01:00:08.496914912] (+1.061584040) thread_switched_out: { thread_id = 1073728, name = "th3" }
+[01:00:08.496964312] (+0.000049400) thread_switched_in: { thread_id = 1075520, name = "th1" }
+[01:00:09.505120792] (+1.008156480) thread_switched_out: { thread_id = 1075520, name = "th1" }
+[01:00:09.505169912] (+0.000049120) thread_switched_in: { thread_id = 1073728, name = "th3" }
+[01:00:09.505281342] (+0.000111430) thread_switched_out: { thread_id = 1073728, name = "th3" }
+[01:00:09.505330752] (+0.000049410) thread_switched_in: { thread_id = 1075520, name = "th1" }
+[01:00:09.513351552] (+0.008020800) thread_switched_out: { thread_id = 1075520, name = "th1" }
+[01:00:09.513401182] (+0.000049630) thread_switched_in: { thread_id = 1080256, name = "idle" }
+[01:00:09.513444862] (+0.000043680) idle: 
+[01:00:11.515120772] (+2.001675910) thread_switched_out: { thread_id = 1080256, name = "idle" }
+[01:00:11.515169442] (+0.000048670) thread_switched_in: { thread_id = 1075520, name = "th1" }
+[01:00:12.531236862] (+1.016067420) thread_switched_out: { thread_id = 1075520, name = "th1" }
+[01:00:12.531286502] (+0.000049640) thread_switched_in: { thread_id = 1080256, name = "idle" }
+[01:00:12.531329982] (+0.000043480) idle: 
+[01:00:15.800083458] (+3.268753476) thread_switched_in: { thread_id = 1080256, name = "idle" }
