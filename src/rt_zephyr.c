@@ -6,9 +6,7 @@
 #include <zephyr.h>
 #include "rt_zephyr.h"
 #include "rt_zephyr_types.h"
-
-NEWTHREADSTACK(th1)
-NEWTHREADSTACK(th2)
+#include "sys/printk.h"
 
 static int p_load = 0;
 
@@ -140,11 +138,15 @@ void run_thread(void *thread_data, void *dummy2, void *dummy3)
 	thread_data_t *tdata = (thread_data_t *) thread_data;
 	event_data_t *events = tdata->events;
 
-	for (int i = 0; i < tdata->nbevents; i++) {
-		printk("event[%d] - name: %s\n", i, events[i].name);
-		run_event(&events[i], &perf, &ldata);
+	for (int j = 0; j < tdata->loop; j++) {
+		for (int i = 0; i < tdata->nbevents; i++) {
+			printk("event[%d] - name: %s\n", i, events[i].name);
+			run_event(&events[i], &perf, &ldata);
+		}
 	}
 }
+
+NEWTHREADSTACK(th1)
 
 void main(void)
 {
@@ -152,16 +154,8 @@ void main(void)
 	p_load = calibrate_cpu_cycles();
 	printk("p_load: %d \n", p_load);
 
-	DEFTHREAD(th1, 2, 0, 1, 1)
-	NEWEVENT(th1, "th1 ev0 sleep", 0, ev_sleep, 3000000)
-	NEWEVENT(th1, "th1 ev1 run", 1, ev_run, 3000000)
-
-	DEFTHREAD(th2, 3, 0, 1, 1)
-	NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 1000000)
-	NEWEVENT(th2, "th2 ev1 sleep", 1, ev_sleep, 1000000)
-	NEWEVENT(th2, "th2 ev2 run", 2, ev_run, 1000000)
-
-	STARTTHREAD(th1)
-	STARTTHREAD(th2)
-	/* TODO: duration */
+	DEFTHREAD(th1, 3, 0, 2, 2)
+	NEWEVENT(th1, "th1 ev0 run", 0, ev_run, 2000000)
+	NEWEVENT(th1, "th1 ev1 sleep", 1, ev_sleep, 3000000)
+	NEWEVENT(th1, "th1 ev2 run", 2, ev_run, 1000000)
 }

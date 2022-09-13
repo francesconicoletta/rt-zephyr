@@ -1,12 +1,5 @@
 #pragma once
 
-typedef struct _log_data_t {
-	unsigned long perf;
-	unsigned long duration;
-	unsigned long c_duration;
-	/* TODO: add needed types */
-} log_data_t;
-
 typedef enum resource_t
 {
 	ev_run,
