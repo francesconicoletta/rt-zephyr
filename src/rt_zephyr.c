@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <timing/timing.h>
-#include <zephyr.h>
+#include <zephyr/timing/timing.h>
+#include <zephyr/sys_clock.h>
+#include <zephyr/sys/printk.h>
+#include <zephyr/kernel.h>
 #include "rt_zephyr.h"
 #include "rt_zephyr_types.h"
-#include "sys/printk.h"
 
 static int p_load = 0;
 
@@ -101,31 +102,27 @@ static inline unsigned long loadwait(unsigned long exec)
 	return perf;
 }
 
-void run_event(event_data_t *event, unsigned long *perf, log_data_t *ldata)
+uint32_t run_event(event_data_t *event, unsigned long *perf, log_data_t *ldata)
 {
 	/* TODO: log data */
+	uint32_t start_time = 0, stop_time = 0;
 	switch(event->type) {
 	case ev_run:
 		{
-			uint32_t start_time, stop_time, duration;
 			start_time = k_cycle_get_32();
 			*perf += loadwait(event->duration);
 			stop_time = k_cycle_get_32();
-			duration = k_cyc_to_ms_floor32(stop_time - start_time);
-			printk("ran for %lu ms\n", (unsigned long) duration);
 		}
 		break;
 	case ev_sleep:
 		{
-			uint32_t start_time, stop_time, duration;
 			start_time = k_cycle_get_32();
 			k_sleep(K_USEC(event->duration));
 			stop_time = k_cycle_get_32();
-			duration = k_cyc_to_ms_floor32(stop_time - start_time);
-			printk("slept for %lu ms\n", (unsigned long) duration);
 		}
 		break;
 	}
+	return k_cyc_to_ms_floor32(stop_time - start_time);
 }
 
 void run_thread(void *thread_data, void *dummy2, void *dummy3)
@@ -134,19 +131,37 @@ void run_thread(void *thread_data, void *dummy2, void *dummy3)
 	ARG_UNUSED(dummy3);
 
 	unsigned long perf = 0;
+	uint32_t duration;
 	log_data_t ldata = {0};
 	thread_data_t *tdata = (thread_data_t *) thread_data;
 	event_data_t *events = tdata->events;
 
 	for (int j = 0; j < tdata->loop; j++) {
 		for (int i = 0; i < tdata->nbevents; i++) {
-			printk("event[%d] - name: %s\n", i, events[i].name);
-			run_event(&events[i], &perf, &ldata);
+			duration = run_event(&events[i], &perf, &ldata);
+			printk("event[%d] - %s - duration %lu\n",
+					i, events[i].name,
+					(unsigned long) duration);
 		}
 	}
 }
 
+uint32_t cycles_per_sec()
+{
+	uint32_t start_time, stop_time;
+	start_time = k_cycle_get_32();
+	loadwait(1000000);
+	stop_time = k_cycle_get_32();
+	printk("%d cycles for 1 sec\n", stop_time - start_time);
+	return stop_time - start_time;
+}
+
 NEWTHREADSTACK(th1)
+NEWTHREADSTACK(th1lo1)
+NEWTHREADSTACK(th1lo2)
+
+NEWTHREADSTACK(th2)
+NEWTHREADSTACK(th2lo1)
 
 void main(void)
 {
@@ -154,8 +169,27 @@ void main(void)
 	p_load = calibrate_cpu_cycles();
 	printk("p_load: %d \n", p_load);
 
-	DEFTHREAD(th1, 3, 0, 2, 2)
+#ifdef CONFIG_SCHED_DEADLINE
+	uint32_t csec = cycles_per_sec();
+#endif
+
+	DEFTHREAD(th1, 2, 0, 4, 1)
 	NEWEVENT(th1, "th1 ev0 run", 0, ev_run, 2000000)
-	NEWEVENT(th1, "th1 ev1 sleep", 1, ev_sleep, 3000000)
-	NEWEVENT(th1, "th1 ev2 run", 2, ev_run, 1000000)
+	NEWEVENT(th1, "th1 ev1 sleep", 1, ev_sleep, 2000000)
+
+	DEFTHREAD(th2, 2, 0, 6, 1)
+	NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 3000000)
+	NEWEVENT(th2, "th2 ev1 sleep", 1, ev_sleep, 3000000)
+
+	DEFTHREAD(th1lo1, 2, 4000000, 4, 1)
+	NEWEVENT(th1lo1, "th1lo1 ev0 run", 0, ev_run, 2000000)
+	NEWEVENT(th1lo1, "th1lo1 ev1 sleep", 1, ev_sleep, 2000000)
+
+	DEFTHREAD(th2lo1, 2, 6000000, 6, 1)
+	NEWEVENT(th2lo1, "th2lo1 ev0 run", 0, ev_run, 3000000)
+	NEWEVENT(th2lo1, "th2lo1 ev1 sleep", 1, ev_sleep, 3000000)
+
+	DEFTHREAD(th1lo2, 2, 8000000, 4, 1)
+	NEWEVENT(th1lo2, "th1lo2 ev0 run", 0, ev_run, 2000000)
+	NEWEVENT(th1lo2, "th1lo2 ev1 sleep", 1, ev_sleep, 2000000)
 }

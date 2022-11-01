@@ -1,0 +1,19 @@
+DEFTHREAD(th1, 2, 0, 4, 1)
+NEWEVENT(th1, "th1 ev0 run", 0, ev_run, 2000000)
+NEWEVENT(th1, "th1 ev1 sleep", 1, ev_sleep, 2000000)
+
+DEFTHREAD(th2, 2, 0, 6, 1)
+NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 3000000)
+NEWEVENT(th2, "th2 ev1 sleep", 1, ev_sleep, 3000000)
+
+DEFTHREAD(th1lo1, 2, 4000000, 4, 1)
+NEWEVENT(th1lo1, "th1lo1 ev0 run", 0, ev_run, 2000000)
+NEWEVENT(th1lo1, "th1lo1 ev1 sleep", 1, ev_sleep, 2000000)
+
+DEFTHREAD(th1lo2, 2, 8000000, 4, 1)
+NEWEVENT(th1lo2, "th1lo2 ev0 run", 0, ev_run, 2000000)
+NEWEVENT(th1lo2, "th1lo2 ev1 sleep", 1, ev_sleep, 2000000)
+
+DEFTHREAD(th2lo1, 2, 6000000, 6, 1)
+NEWEVENT(th2lo1, "th2lo1 ev0 run", 0, ev_run, 3000000)
+NEWEVENT(th2lo1, "th2lo1 ev1 sleep", 1, ev_sleep, 3000000)

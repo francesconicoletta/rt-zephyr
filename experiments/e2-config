@@ -1,19 +1,13 @@
+DEFTHREAD(th1, 3, 0, 1, 2)
+NEWEVENT(th1, "th1 ev0 sleep", 0, ev_sleep, 2000000)
+NEWEVENT(th1, "th1 ev1 run", 1, ev_run, 3000000)
+NEWEVENT(th1, "th1 ev2 sleep", 2, ev_sleep, 1000000)
 
-DEFTHREAD(th1, 3, 1000000, 1, 7)
-NEWEVENT(th1, "th1 ev0 run", 0, ev_run, 1000000)
-NEWEVENT(th1, "th1 ev1 sleep", 1, ev_sleep, 2000000)
-NEWEVENT(th1, "th1 ev2 run", 2, ev_run, 1000000)
+DEFTHREAD(th2, 2, 0, 1, 4)
+NEWEVENT(th2, "th2 ev0 run", 0, ev_run, 4000000)
+NEWEVENT(th2, "th2 ev1 sleep", 1, ev_sleep, 1000000)
 
-DEFTHREAD(th2, 3, 0, 1, 2)
-NEWEVENT(th2, "th2 ev0 sleep", 0, ev_sleep, 2000000)
-NEWEVENT(th2, "th2 ev1 run", 1, ev_run, 3000000)
-NEWEVENT(th2, "th2 ev2 sleep", 2, ev_sleep, 1000000)
-NEWEVENT(th2, "th2 ev3 run", 3, ev_run, 1000000)
-
-DEFTHREAD(th3, 2, 0, 1, 4)
-NEWEVENT(th3, "th3 ev0 run", 0, ev_run, 4000000)
-NEWEVENT(th3, "th3 ev1 sleep", 1, ev_sleep, 1000000)
-
-1. CONFIG_SCHED_DUMB
-2. CONFIG_SCHED_SCALABLE
-3. CONFIG_SCHED_MULTIQ
+DEFTHREAD(th3, 3, 1000000, 1, 7)
+NEWEVENT(th3, "th3 ev0 run", 0, ev_run, 1000000)
+NEWEVENT(th3, "th3 ev1 sleep", 1, ev_sleep, 2000000)
+NEWEVENT(th3, "th3 ev2 run", 2, ev_run, 1000000)

@@ -4,7 +4,6 @@
 #define STR(s) #s
 
 #define STACKSIZE	1024
-#define MAX_PHASES	5
 #define MAX_EVENTS	5
 
 #define NEWTHREADSTACK(t_name)							\
@@ -19,7 +18,7 @@
 			thread_##t_name.priority, 0, thread_##t_name.delay);	\
 	k_thread_name_set(&thread_data_##t_name, thread_##t_name.name);
 
-#define DEFTHREAD(t_name, evn, del, lo, pri)					\
+#define THREADVARS(t_name, evn, del, lo, pri)					\
 	static k_tid_t thread_tid_##t_name;					\
 	static thread_data_t thread_##t_name;					\
 	static event_data_t events_##t_name[MAX_EVENTS];			\
@@ -29,7 +28,20 @@
 	thread_##t_name.loop = lo;						\
 	thread_##t_name.priority = pri;						\
 	thread_##t_name.name = XSTR(t_name);					\
+
+#ifndef CONFIG_SCHED_DEADLINE
+#define DEFTHREAD(t_name, evn, del, lo, pri)					\
+	THREADVARS(t_name, evn, del, lo, pri)					\
 	CRTHREAD(t_name)
+#else
+#define DEFTHREAD(t_name, evn, del, lo, pri)					\
+	THREADVARS(t_name, evn, del, 1, pri)					\
+	CRTHREAD(t_name)							\
+	k_thread_deadline_set(thread_tid_##t_name, csec * lo +			\
+			del / 1000000 * csec);					\
+	printk("deadline %d\n", k_cyc_to_ms_floor32(csec * lo +			\
+			del / 1000000 * csec));
+#endif
 
 #define STARTTHREAD(t_name)	k_thread_start(&thread_data_##t_name);
 
